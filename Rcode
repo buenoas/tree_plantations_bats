@@ -35,7 +35,7 @@ x = iNEXT(df,
           knots = max(colSums(df)) * 2,
           se = TRUE,
           conf = 0.95,
-          nboot = 50)
+          nboot = 1000)
 
 
 # VISUALIZA UM GRAFICO SIMPLES

@@ -92,8 +92,6 @@ p =
   annotate("text", x = 37, y = 1,
            label = "Standardized\nsampling effort",
            size = 3, vjust = 0.3, hjust = 0, colour = "grey50") +
-  #annotate("rect", xmin = 51.5, xmax = 53.5, ymin = -Inf, ymax = 1,
-  #        fill = "red") +
   
   theme_classic(base_size = 12) +
   theme(legend.position = "top",

@@ -81,7 +81,7 @@ p =
   
   scale_x_continuous(limits = c(0.99, NA),
                      breaks = c(1, 10, 20, 30, 36, 40, 50, 55, 58, 61),
-                     labels = c("1", "10", "20", "30", "36", "40", "50",
+                     labels = c("1", "10", "20", "30", "36", "40", "52",
                                 "36", "36", "36")) +
   scale_y_continuous(limits = c(0.99,
                                 max(subset(z, m == 18 * 2)$qD.UCL)),

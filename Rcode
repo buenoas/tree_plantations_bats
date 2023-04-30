@@ -75,7 +75,8 @@ p =
   
   labs(x = "Number of individuals captured",
        y = "Number of bat species",
-       colour = NULL) +
+       colour = NULL,
+       title = "Projeto FLORESTAS | Morcegos") +
   
   scale_x_continuous(limits = c(0.99, NA),
                      breaks = c(1, 10, 20, 30, 36, 40, 50, 55, 58, 61),
@@ -118,7 +119,8 @@ g =
   
   labs(x = "",
        y = "",
-       colour = NULL) +
+       colour = NULL,
+       title = "") +
   
   scale_x_discrete(labels = c("36", "36", "36")) +
   scale_y_continuous(limits = c(0.99,

@@ -4,6 +4,7 @@
 library(iNEXT)
 library(ggplot2)
 library(rphylopic)
+library(gridExtra)
 
 
 # PRODUZ OS DADOS A PARTIR DA TABELA DO TCC DO LEONARDO

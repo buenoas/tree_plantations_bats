@@ -9,10 +9,10 @@ library(stringi)
 # IMPORTA OS DADOS
 x = read.csv("https://raw.githubusercontent.com/buenoas/tree_plantations_bats/main/Morcegos_FLONA_Registros.csv")
 
-# REMOVE LINHAS E COLUNAS EM BRANCO
+# MANTEM APENAS LINHAS E COLUNAS COM INFORMACOES
 x = x[1:120, 1:20]
 
-# REMOVE NUMEROS DE REGISTRO SEM INFORMACAO DE ESPECIES
+# REMOVE NUMEROS DE REGISTRO SEM INFORMACOES DE ESPECIES
 x = x[-which(x$Espécie == "Campo de Novembro"), ]
 x = x[-which(x$Espécie == "Campo de Janeiro/Fevereiro"), ]
 x = x[-which(x$Espécie == "Campo de Abril/Maio"), ]
@@ -23,9 +23,9 @@ x$Espécie[x$Espécie == "Sturnira lilium "] = "Sturnira lilium"
 # Falta um "i" em Lasiurus blossevillii
 x$Espécie[x$Espécie == "Lasiurus blossevilli"] = "Lasiurus blossevillii"
 
-# ATUALIZA A IDENTIFICACAO DOS MYOTIS
-x$Espécie[which(x$Registro == 31)] = "Myotis sp3" # possivelmente
-x$Espécie[which(x$Registro == 34)] =  "Myotis sp3" # possivelmente
+# ATUALIZA A IDENTIFICACAO DAS ESPECIES
+x$Espécie[which(x$Registro == 31)] = "Myotis sp3" # provavelmente
+x$Espécie[which(x$Registro == 34)] =  "Myotis sp3" # provavelmente
 x$Espécie[which(x$Registro == 55)] = "Myotis sp1"
 x$Espécie[which(x$Registro == 73)] = "Myotis sp2"
 x$Espécie[which(x$Registro == 75)] = "Myotis sp2"
@@ -33,4 +33,4 @@ x$Espécie[which(x$Registro == 84)] = "Myotis sp3"
 x$Espécie[which(x$Registro == 85)] = "Myotis sp3"
 x$Espécie[which(x$Registro == 86)] = "Myotis sp1"
 x$Espécie[which(x$Registro == 89)] = "Myotis sp3"
-x$Espécie[which(x$Registro == 93)] = "Eptesicus cf. furinalis"
+x$Espécie[which(x$Registro == 93)] = "Eptesicus furinalis" # confirmar

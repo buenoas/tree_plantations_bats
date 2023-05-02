@@ -12,9 +12,9 @@ x = read.csv("https://raw.githubusercontent.com/buenoas/tree_plantations_bats/ma
 x = x[1:120, 1:20]
 
 # REMOVE NUMEROS DE REGISTRO SEM INFORMACOES DE ESPECIES
-x = x[-which(x$Espécie == "Campo de Novembro"), ]
-x = x[-which(x$Espécie == "Campo de Janeiro/Fevereiro"), ]
-x = x[-which(x$Espécie == "Campo de Abril/Maio"), ]
+x = x[-which(x$Espécie == "Campo de Novembro" | # registro 49
+               x$Espécie == "Campo de Janeiro/Fevereiro" | # registro 90
+               x$Espécie == "Campo de Abril/Maio"), ] # registro 104
 
 # CORRIGE O NOME DAS ESPECIES
 # Espaco extra em Sturnira lilium

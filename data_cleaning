@@ -4,7 +4,6 @@
 
 # CARREGA OS PACOTES
 library(stringr)
-library(stringi)
 
 # IMPORTA OS DADOS
 x = read.csv("https://raw.githubusercontent.com/buenoas/tree_plantations_bats/main/Morcegos_FLONA_Registros.csv")

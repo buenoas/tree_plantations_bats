@@ -1,9 +1,30 @@
-#####################################
-### LIMPEZA DOS DADOS DE MORCEGOS ###
-#####################################
+# Nova paleta de cores
+#"#2DBF81" (verde)
+#"#812DBF" (roxo)
+#"#BF812D" (marrom)
+
+# LIMPA A AREA DE TRABALHO
+remove(list = ls())
+
+# REMOVE A NOTACAO CIENTIFICA
+options(scipen = 999)
+
+# OBTEM RESULTADOS REPRODUZIVEIS
+set.seed(650383828) # numero gerado com o comando: sample(1:.Machine$integer.max, 1)
+
+# DEFINE A AREA DE TRABALHO
+#setwd("C:/Users/anderson/OneDrive/Documents/Pesquisa/Projetos/Projeto_FLORESTAS/Projeto_FLORESTAS_Aves/meta-analise")
 
 # CARREGA OS PACOTES
 library(stringr)
+library(vegan)
+library(plyr)
+library(ggplot2)
+
+
+#####################################
+### LIMPEZA DOS DADOS DE MORCEGOS ###
+#####################################
 
 # IMPORTA OS DADOS
 x = read.csv("https://raw.githubusercontent.com/buenoas/tree_plantations_bats/main/Morcegos_FLONA_Registros.csv")
@@ -33,3 +54,92 @@ x$Espécie[which(x$Registro == 85)] = "Myotis sp3"
 x$Espécie[which(x$Registro == 86)] = "Myotis sp1"
 x$Espécie[which(x$Registro == 89)] = "Myotis sp3"
 x$Espécie[which(x$Registro == 93)] = "Eptesicus furinalis" # confirmar
+
+
+########################
+### ANALISE DE DADOS ###
+########################
+
+# Cria um vetor para somar a abundância das espécies por parcela
+# Cada linha corresponde ao registro de 1 individuo
+x$ocorrencia = 1
+
+# Cria uma matriz de abundância de espécies por parcela
+morcegos = tapply(x$ocorrencia, list(x$Pacela, x$Espécie), sum)
+
+# Converte NA em zero
+morcegos[is.na(morcegos)] = 0
+
+
+### ANALISE DE COMPOSICAO DE ESPECIES ###
+# Padroniza os dados de abundância pela soma das linhas (i.e. abundancia relativa)
+morcegos_std = morcegos/rowSums(morcegos)
+
+# Calcula a distância de Bray-Curtis
+morcegos_bray = vegdist(morcegos_std,
+                        method = "bray",
+                        binary = FALSE)
+
+# PCoA
+pcoa = cmdscale(morcegos_bray,
+                k = 2,
+                eig = TRUE,
+                add = TRUE)
+
+porcentagem_eixos = pcoa$eig/sum(pcoa$eig) * 100
+
+# Explicacao obtida com dois eixos de ordenacao (PCoA)
+porcentagem_eixos[1:2]
+
+# NMDS
+nmds = metaMDS(morcegos_std,
+               distance = "bray",
+               k = 1,
+               trymax = 1000, 
+               autotransform = FALSE)
+
+# Prepara os dados
+nmds.xy = data.frame(nmds$points)
+nmds.xy$habitat = str_sub(rownames(nmds.xy), 1, 1)
+nmds.xy$habitat[nmds.xy$habitat == "A"] = "araucaria_plantation"
+nmds.xy$habitat[nmds.xy$habitat == "N"] = "natural_forest"
+nmds.xy$habitat[nmds.xy$habitat == "P"] = "pine_plantation"
+nmds.xy$habitat = factor(nmds.xy$habitat,
+                         levels = c("natural_forest",
+                                    "araucaria_plantation",
+                                    "pine_plantation"))
+
+# Grafico
+nmds_graph = 
+  
+  ggplot(data = nmds.xy[order(nmds.xy$MDS1), ],
+         aes(x = habitat, y = MDS1, fill = habitat)) +
+  
+  labs(x = NULL,
+       y = "Species composition (NMDS axis 1)",
+       fill = NULL) +
+  
+  scale_x_discrete(labels = c("Natural\nForest",
+                              "Araucaria\nPlantation",
+                              "Pine\nPlantation")) +
+  scale_fill_manual(values = c("#2DBF81", "#812DBF", "#BF812D"),
+                    labels = c("Natural Forest",
+                               "Araucaria Plantation",
+                               "Pine Plantation")) +
+  
+  geom_boxplot(outlier.shape = NA, width = 0.6,
+               alpha = 0.1, show.legend = FALSE) +
+  geom_jitter(shape = 21, size = 3, height = 0, width = 0.3) +
+  
+  theme_classic(base_size = 12) +
+  theme(legend.position = "none",
+        axis.line = element_line(colour = "black", linewidth = 1/3),
+        axis.ticks = element_line(colour = "black", linewidth = 1/3),
+        axis.text = element_text(colour = "black"),
+        axis.title = element_text(colour = "black"))
+
+nmds_graph
+
+# Salva o grafico
+ggsave(nmds_graph, filename = "bats_nmds.jpg",
+       dpi = 600, w = 15, h = 15, units = "cm")

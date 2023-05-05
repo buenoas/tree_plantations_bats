@@ -21,6 +21,7 @@ library(stringr)
 library(vegan)
 library(ggplot2)
 library(rstatix)
+library(ape)
 
 
 #####################################
@@ -66,7 +67,7 @@ x$Espécie[which(x$Registro == 93)] = "Eptesicus furinalis" # confirmar
 x$ocorrencia = 1
 
 # Cria uma matriz de abundância de espécies por parcela
-morcegos = tapply(x$ocorrencia, list(x$Pacela, x$Espécie), sum)
+morcegos = as.data.frame(tapply(x$ocorrencia, list(x$Pacela, x$Espécie), sum))
 
 # Converte NA em zero
 morcegos[is.na(morcegos)] = 0
@@ -152,3 +153,45 @@ nmds.xy %>% levene_test(MDS1 ~ habitat)
 # TESTE DE ANOVA
 anova_test = aov(nmds.xy$MDS1 ~ nmds.xy$habitat)
 summary(anova_test)
+
+
+####################################
+### TESTE DE CORRELACAO ESPACIAL ###
+####################################
+
+# Coordenadas das parcelas
+# As coordenadas sao dos canos e nao dos pontos centrais
+# As coordenadas da N1 sao aproximadas
+
+coordenadas = read.table("https://raw.githubusercontent.com/buenoas/tree_plantations_bats/main/coordenadas_parcelas.txt", header = TRUE)
+
+# Prepara os dados
+dists = as.matrix(dist(cbind(coordenadas$longitude,
+                             coordenadas$latitude)))
+
+dists.inv = 1/dists
+diag(dists.inv) = 0
+
+# Moran's I
+#hipotese nula - distribuicao aleatoria
+#hipotese alternativa - distribuicao nao aleatoria
+#p > 0.05 = SEM autocorrelacao espacial
+#p < 0.05 = COM autocorrelacao espacial
+
+# Riqueza
+Moran.I(specnumber(morcegos), dists.inv) # COM autocorrelacao espacial
+
+# Abundancia
+Moran.I(rowSums(morcegos), dists.inv) # SEM autocorrelacao espacial
+
+# Composicao (NMDS 1)
+Moran.I(nmds.xy$MDS1, dists.inv) # COM autocorrelacao espacial
+
+# Abundancia de Desmodus rotundus
+Moran.I(morcegos$`Desmodus rotundus`, dists.inv) # COM autocorrelacao espacial
+
+# Abundancia de Sturnira lilium
+Moran.I(morcegos$`Sturnira lilium`, dists.inv) # SEM autocorrelacao espacial
+
+# Abundancia de Myotis spp.
+Moran.I(rowSums(morcegos[, 6:8]), dists.inv) # SEM autocorrelacao espacial
